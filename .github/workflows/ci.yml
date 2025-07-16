@@ -10,15 +10,35 @@ jobs:
   build_and_test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }}"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
     env:
       DATABASE_URL: postgresql+asyncpg://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}
       REDIS_HOST: localhost
       REDIS_PORT: 6379
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      ALGHORITHM: HS256
+      ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: 30
       PYTHONUNBUFFERED: 1
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -31,21 +51,6 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-
-      - name: Start Docker Compose services
-        run: |
-          docker-compose -f docker-compose.yml up -d db redis
-
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          for i in {1..10}; do
-            if docker exec task15_db pg_isready -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }}; then
-              echo "PostgreSQL is ready"
-              break
-            fi
-            echo "Waiting for PostgreSQL..."
-            sleep 5
-          done
 
       - name: Run tests with pytest
         run: |
