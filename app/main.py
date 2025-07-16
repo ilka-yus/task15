@@ -28,7 +28,7 @@ async def invalidate_notes_cache(redis: redis.Redis, user_id: int):
 
 @app.get("/")
 async def root():
-    return {"message": "Работает"}
+    return {"message": "работает"}
 
 @app.on_event("startup")
 async def on_startup():
