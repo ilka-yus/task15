@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+.env
+.env.docker
+.env.test
+.env.*
+
+# VSCode
+.vscode/
+
+# Docker
+*.log
+*.pid
+*.db
+*.sqlite3
+docker-compose.override.yml
+
+# Pytest
+.pytest_cache/
+
+# Redis dump
+dump.rdb
+
+# Postgres volume (if mounted to host)
+postgres_data/
