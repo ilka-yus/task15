@@ -9,6 +9,9 @@ from typing import AsyncGenerator
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel
 
+for table in SQLModel.metadata.tables.values():
+    table.schema = None
+
 from app.main import app
 from app.database import get_session
 from app.models import User, Note
